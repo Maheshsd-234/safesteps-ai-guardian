@@ -27,9 +27,9 @@ interface EmergencyContact {
 
 const emergencyContacts: EmergencyContact[] = [
   {
-    id: "911",
+    id: "112",
     name: "Emergency Services",
-    number: "911",
+    number: "112",
     description: "Police, Fire, Medical Emergency",
     icon: Phone,
     color: "destructive",
@@ -39,7 +39,7 @@ const emergencyContacts: EmergencyContact[] = [
   {
     id: "poison",
     name: "Poison Control",
-    number: "1-800-222-1222",
+    number: "1-800-425-1213",
     description: "Poisoning emergencies and information",
     icon: AlertTriangle,
     color: "warning",
@@ -49,7 +49,7 @@ const emergencyContacts: EmergencyContact[] = [
   {
     id: "disaster",
     name: "Disaster Hotline",
-    number: "1-800-621-3362", 
+    number: "+91-23716441/2/3", 
     description: "Red Cross disaster assistance",
     icon: Shield,
     color: "primary",
@@ -59,7 +59,7 @@ const emergencyContacts: EmergencyContact[] = [
   {
     id: "suicide",
     name: "Crisis Lifeline",
-    number: "988",
+    number: "9152987821",
     description: "Suicide & Crisis prevention",
     icon: Heart,
     color: "success",
@@ -69,7 +69,7 @@ const emergencyContacts: EmergencyContact[] = [
   {
     id: "fire",
     name: "Non-Emergency Fire",
-    number: "311",
+    number: "101",
     description: "Non-emergency fire department",
     icon: Flame,
     color: "accent",
