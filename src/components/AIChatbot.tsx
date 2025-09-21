@@ -3,8 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Bot, Send, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
+import { Bot, Send, Mic, MicOff} from "lucide-react";
 import { toast } from "sonner";
+import axios from "axios
+  // NOTE: Store your Gemini API key securely; don't expose it in production frontend!
+const GEMINI_API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY; // Or hardcode for demo: "YOUR_GEMINI_API_KEY"
 
 interface Message {
   id: string;
@@ -43,24 +46,20 @@ const AIChatbot = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
-  const generateResponse = (question: string): string => {
-    const responses: Record<string, string> = {
-      "earthquake": "During an earthquake: 🔸 Drop to hands and knees 🔸 Take cover under sturdy furniture 🔸 Hold on until shaking stops 🔸 Stay away from windows and heavy objects 🔸 If outdoors, move away from buildings",
-      "emergency kit": "Essential emergency kit items: 🔸 Water (1 gallon per person per day) 🔸 Non-perishable food (3-day supply) 🔸 Flashlight & batteries 🔸 First aid kit 🔸 Medications 🔸 Important documents 🔸 Cash 🔸 Radio",
-      "heart attack": "Heart attack first aid: 🔸 Call 911 immediately 🔸 Have person sit down and stay calm 🔸 Loosen tight clothing 🔸 Give aspirin if not allergic 🔸 Begin CPR if person becomes unconscious 🔸 Don't leave them alone",
-      "tsunami": "Tsunami safety: 🔸 Move to high ground immediately 🔸 Go at least 2 miles inland or 100 feet above sea level 🔸 Don't wait for official warnings 🔸 Stay away from beaches and waterways 🔸 Listen to emergency broadcasts",
-      "fire safety": "Fire safety tips: 🔸 Install smoke detectors 🔸 Create evacuation plan 🔸 Keep fire extinguisher accessible 🔸 Don't overload electrical outlets 🔸 Check heating equipment annually 🔸 Practice fire drills",
-    };
-
-    const lowerQuestion = question.toLowerCase();
-    for (const [key, response] of Object.entries(responses)) {
-      if (lowerQuestion.includes(key)) {
-        return response;
-      }
+// Use Gemini API for natural response
+  const generateGeminiResponse = async (question: string): Promise<string> => {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+      const res = await axios.post(url, {
+        contents: [{ parts: [{ text: question }] }]
+      });
+      return (
+        res.data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+        "Sorry, I couldn't find an answer."
+      );
+    } catch (err) {
+      return "Sorry, there was an error connecting to Gemini AI.";
     }
-
-    return "I'm here to help with disaster preparedness questions! Try asking about specific emergencies like earthquakes, fires, medical emergencies, or emergency planning. You can also ask about creating emergency kits or evacuation procedures.";
   };
 
   const handleSendMessage = async (text: string) => {
@@ -77,9 +76,10 @@ const AIChatbot = () => {
     setInputText("");
     setIsLoading(true);
 
-    // Simulate AI response delay
-    setTimeout(() => {
-      const response = generateResponse(text);
+    
+     // Use Gemini for response
+    const response = await generateGeminiResponse(text);
+    
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: response,
@@ -89,15 +89,6 @@ const AIChatbot = () => {
 
       setMessages(prev => [...prev, botMessage]);
       setIsLoading(false);
-
-      // Text-to-speech for bot responses
-      if (speechEnabled && 'speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(response);
-        utterance.rate = 0.9;
-        utterance.pitch = 1;
-        speechSynthesis.speak(utterance);
-      }
-    }, 1500);
   };
 
   const startListening = () => {
